@@ -66,7 +66,6 @@ public class CallButtonFragment
     private ImageButton mPauseVideoButton;
     private ImageButton mOverflowButton;
     private ImageButton mAddParticipantButton;
-    private ImageButton mMoreMenuButton;
 
     private PopupMenu mAudioModePopup;
     private boolean mAudioModePopupVisible;
@@ -128,17 +127,6 @@ public class CallButtonFragment
         mAddParticipantButton.setOnClickListener(this);
         mOverflowButton = (ImageButton) parent.findViewById(R.id.overflowButton);
         mOverflowButton.setOnClickListener(this);
-
-        mMoreMenuButton = (ImageButton) parent.findViewById(R.id.moreMenuButton);
-        if (mMoreMenuButton != null) {
-            mMoreMenuButton.setOnClickListener(this);
-            mMoreMenu = new MorePopupMenu(parent.getContext(), mMoreMenuButton);
-
-            mMoreMenu.inflate(R.menu.incall_more_menu);
-            mMoreMenu.setOnMenuItemClickListener(this);
-
-            mMoreMenuButton.setOnTouchListener(mMoreMenu.getDragToOpenListener());
-        }
 
         return parent;
     }
@@ -214,9 +202,6 @@ public class CallButtonFragment
             case R.id.overflowButton:
                 mOverflowPopup.show();
                 break;
-            case R.id.moreMenuButton:
-                mMoreMenu.show();
-                break;
             default:
                 Log.wtf(this, "onClick: unexpected");
                 break;
@@ -244,7 +229,6 @@ public class CallButtonFragment
         mPauseVideoButton.setEnabled(isEnabled);
         mOverflowButton.setEnabled(isEnabled);
         mAddParticipantButton.setEnabled(isEnabled);
-        mMoreMenuButton.setEnabled(isEnabled);
     }
 
     @Override
@@ -540,17 +524,6 @@ public class CallButtonFragment
             case R.id.audio_mode_bluetooth:
                 mode = AudioState.ROUTE_BLUETOOTH;
                 break;
-
-            case R.id.menu_start_record:
-                ((InCallActivity)getActivity()).startInCallRecorder();
-
-                return true;
-
-            case R.id.menu_stop_record:
-                ((InCallActivity)getActivity()).stopInCallRecorder();
-
-                return true;
-
             default:
                 Log.e(this, "onMenuItemClick:  unexpected View ID " + item.getItemId()
                         + " (MenuItem = '" + item + "')");
@@ -793,33 +766,6 @@ public class CallButtonFragment
             e.setPackageName(context.getPackageName());
             e.getText().add(context.getResources().getString(stringId));
             manager.sendAccessibilityEvent(e);
-        }
-    }
-
-    private class MorePopupMenu extends PopupMenu {
-        public MorePopupMenu(Context context, View anchor) {
-            super(context, anchor);
-        }
-
-        @Override
-        public void show() {
-            final Menu menu = getMenu();
-            final MenuItem startRecord = menu.findItem(R.id.menu_start_record);
-            final MenuItem stopRecord = menu.findItem(R.id.menu_stop_record);
-
-            boolean isRecording = ((InCallActivity)getActivity()).isCallRecording();
-            boolean isRecordEnabled = ((InCallActivity)getActivity()).isCallRecorderEnabled();
-
-            boolean startEnabled = !isRecording && isRecordEnabled;
-            boolean stopEnabled = isRecording && isRecordEnabled;
-
-            startRecord.setVisible(startEnabled);
-            startRecord.setEnabled(startEnabled);
-
-            stopRecord.setVisible(stopEnabled);
-            stopRecord.setEnabled(stopEnabled);
-
-            super.show();
         }
     }
 
